@@ -25,6 +25,9 @@ go.work.sum
 # env file
 .env
 
+# local env overrides (secrets)
+config/compose/**/.env.local
+
 # local compose config
 config/compose/local
 

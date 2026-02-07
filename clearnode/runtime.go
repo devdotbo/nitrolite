@@ -72,6 +72,13 @@ func InitBackbone() *Backbone {
 		logger.Warn(".env file not found")
 	}
 
+	// Optional local overrides for development. This is intentionally untracked.
+	configDotEnvLocalPath := filepath.Join(configDirPath, ".env.local")
+	logger.Info("loading .env.local file", "path", configDotEnvLocalPath)
+	if err := godotenv.Overload(configDotEnvLocalPath); err != nil {
+		logger.Warn(".env.local file not found")
+	}
+
 	var conf Config
 	if err := cleanenv.ReadEnv(&conf); err != nil {
 		logger.Fatal("failed to read env", "err", err)
