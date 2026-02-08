@@ -85,6 +85,7 @@ export class WebsocketDialer implements Dialer {
   private eventQueue: Message[] = [];
   private eventResolvers: Array<(value: Message) => void> = [];
   private closeHandler?: (err?: Error) => void;
+  private pingInterval?: ReturnType<typeof setInterval>;
 
   constructor(config: WebsocketDialerConfig = DefaultWebsocketDialerConfig) {
     this.config = config;
@@ -202,6 +203,7 @@ export class WebsocketDialer implements Dialer {
    * Close closes the connection gracefully.
    */
   async close(): Promise<void> {
+    this.stopPingInterval();
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -236,6 +238,7 @@ export class WebsocketDialer implements Dialer {
   }
 
   private handleClose(error?: Error): void {
+    this.stopPingInterval();
     this.ws = null;
     // Reject all pending requests
     for (const [id, sink] of this.responseSinks.entries()) {
@@ -255,9 +258,10 @@ export class WebsocketDialer implements Dialer {
   }
 
   private startPingInterval(): void {
-    const interval = setInterval(() => {
+    this.stopPingInterval();
+    this.pingInterval = setInterval(() => {
       if (!this.isConnected()) {
-        clearInterval(interval);
+        this.stopPingInterval();
         return;
       }
 
@@ -275,9 +279,16 @@ export class WebsocketDialer implements Dialer {
         this.ws!.send(data);
       } catch (error) {
         console.error('Failed to send ping:', error);
-        clearInterval(interval);
+        this.stopPingInterval();
       }
     }, this.config.pingInterval);
+  }
+
+  private stopPingInterval(): void {
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+      this.pingInterval = undefined;
+    }
   }
 }
 

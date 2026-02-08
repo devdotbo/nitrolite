@@ -28,9 +28,9 @@
         "prettier": "prettier --write .",
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
-        "test:integration": "jest --config jest.integration.config.js",
-        "test:integration:watch": "jest --config jest.integration.config.js --watch",
-        "test:integration:coverage": "jest --config jest.integration.config.js --coverage",
+        "test:integration": "jest --config jest.integration.config.cjs",
+        "test:integration:watch": "jest --config jest.integration.config.cjs --watch",
+        "test:integration:coverage": "jest --config jest.integration.config.cjs --coverage",
         "test:nonregression": "npm run test:integration",
         "test:all": "npm run test && npm run test:integration",
         "prepublishOnly": "npm run clean && npm run build:prod"

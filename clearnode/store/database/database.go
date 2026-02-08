@@ -256,7 +256,19 @@ func migratePostgres(cnf DatabaseConfig, embedMigrations embed.FS) error {
 }
 
 func migrateSqlite(db *gorm.DB) error {
-	if err := db.AutoMigrate(&AppLedgerEntryV1{}, &Channel{}, &AppSessionV1{}, &ContractEvent{}, &BlockchainAction{}, &SessionKey{}); err != nil {
+	// Keep sqlite schema in sync with postgres migrations. This is used in local dev
+	// and forknet where we want a zero-config DB that still supports channel flows.
+	if err := db.AutoMigrate(
+		&AppLedgerEntryV1{},
+		&Channel{},
+		&State{},
+		&Transaction{},
+		&AppSessionV1{},
+		&AppParticipantV1{},
+		&ContractEvent{},
+		&BlockchainAction{},
+		&SessionKey{},
+	); err != nil {
 		return err
 	}
 	return nil
